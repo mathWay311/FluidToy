@@ -1,11 +1,13 @@
-#include <vector>
+#pragma once
 
+#include <vector>
+#include "utilities.h"
+using enum field_type;
 class FluidDomain
 {
 public:
-	enum field_type {U_FIELD, V_FIELD, S_FIELD};
-	enum debug_mode {NONE, MIN, FULL};
-	const double overRelaxation = 1.9;
+	
+	double overRelaxation;
 	unsigned int num_cells_x; 
 	unsigned int num_cells_y;
 	unsigned int num_cells;
@@ -22,7 +24,8 @@ public:
 	debug_mode mode;
 	unsigned int iteration_counter;
 
-	FluidDomain(unsigned int numx, unsigned int numy, debug_mode mode);
+	public: FluidDomain(unsigned int numx, unsigned int numy, debug_mode mode);
+	public: FluidDomain();
 
 	void integrate(double dt, double gravity);
 	void solveIncompressibility(unsigned int numIters, double dt);

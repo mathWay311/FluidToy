@@ -1,11 +1,15 @@
+
 #include <iostream>
 #include "fluid.h"
 #include <cmath>
 
+
+using enum debug_mode;
+
 FluidDomain::FluidDomain(unsigned int numx, unsigned numy, debug_mode mode_)
 {
 	enum field_type {U_FIELD, V_FIELD, S_FIELD};
-	
+	double overRelaxation = 1.9;
 	density = 1000;
 	mode = mode_;
 	iteration_counter = 0;
@@ -20,6 +24,37 @@ FluidDomain::FluidDomain(unsigned int numx, unsigned numy, debug_mode mode_)
 	S.resize(num_cells);
 	M.resize(num_cells);
 	newM.resize(num_cells);
+
+	if (mode == FULL)
+	{
+		std::cout << "Total number of cells: " << U.size() << std::endl;
+	}
+}
+
+FluidDomain::FluidDomain()
+{
+	enum field_type {U_FIELD, V_FIELD, S_FIELD};
+	double overRelaxation = 1.9;
+	density = 1000;
+	mode = FULL;
+	iteration_counter = 0;
+	num_cells_x = 0;
+	num_cells_y = 0;
+	num_cells = num_cells_y * num_cells_x;
+
+	U.resize(num_cells);
+	V.resize(num_cells);
+	newU.resize(num_cells);
+	newV.resize(num_cells);
+	P.resize(num_cells);
+	S.resize(num_cells);
+	M.resize(num_cells);
+	newM.resize(num_cells);
+
+	if (mode == FULL)
+	{
+		std::cout << "Total number of cells: " << U.size() << std::endl;
+	}
 }
 
 void FluidDomain::integrate(double dt, double gravity)
@@ -101,6 +136,7 @@ double FluidDomain::sampleField(double x, double y, field_type field) {
 				case U_FIELD: dy = h2; break;
 				case V_FIELD: dx = h2; break;
 				case S_FIELD: dx = h2; dy = h2; break;
+				default:break;
 
 			}
 
@@ -135,7 +171,8 @@ double FluidDomain::sampleField(double x, double y, field_type field) {
 					tx*ty * M[x1*n + y1] +
 					sx*ty * M[x0*n + y1];
 					break;
-
+				default:
+					break;
 			}
 
 			
@@ -236,7 +273,7 @@ void FluidDomain::simulate(double dt, double gravity, unsigned int numIters)
 	integrate(dt, gravity);
 	if (mode == MIN || mode == FULL) print_msg("Решение несжимаемости...");
 	solveIncompressibility(numIters, dt);
-	if (mode == MIN || mode == FULL) print_msg("Экстраполяция...");
+	//if (mode == MIN || mode == FULL) print_msg("Экстраполяция...");
 	extrapolate();
 	if (mode == MIN || mode == FULL) print_msg("Адвекция скорости...");
 	advectVel(dt);
@@ -250,9 +287,9 @@ void FluidDomain::simulate(double dt, double gravity, unsigned int numIters)
 
 void FluidDomain::debug_print_field(field_type type)
 {
-	for (unsigned int i = 1; i < num_cells_x - 1; i++) 
+	for (unsigned int i = 0; i < num_cells_x; i++) 
 	{
-		for (unsigned int j = 1; j < num_cells_y - 1; j++)
+		for (unsigned int j = 0; j < num_cells_y; j++)
 		{
 			switch(type)
 			{
@@ -264,6 +301,12 @@ void FluidDomain::debug_print_field(field_type type)
 					break;
 				case S_FIELD:
 					std::cout << S[i*num_cells_y + j] << " ";
+					break;
+				case P_FIELD:
+					std::cout << P[i*num_cells_y + j] << " ";
+					break;
+				case M_FIELD:
+					std::cout << M[i*num_cells_y + j] << " ";
 					break;
 			}
 			

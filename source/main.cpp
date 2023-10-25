@@ -1,10 +1,13 @@
+
 #include <iostream>
 #include "fluid.h"
 #include "scene.h"
-#include <cstring>
+#include "utilities.h"
+#include "string.h"
 /*
 	Глобальные переменные
 */
+using enum debug_mode;
 
 unsigned int num_cells_x = 100; // размер решётки по горизонтали
 unsigned int num_cells_y = 100; // размер решётки по вертикали
@@ -52,9 +55,13 @@ int main(int argc, char const *argv[])
 {	
 	process_arguments(argc, argv); // обработка аргументов
 	config_printout();
-	FluidDomain fluidDomain = FluidDomain(num_cells_x, num_cells_y, fluidDomain.FULL);
-	fluidDomain.debug_print_field(fluidDomain.U_FIELD);
-	fluidDomain.simulate(1.0/120.0, -9.81, 5);
-	fluidDomain.debug_print_field(fluidDomain.U_FIELD);
+	Scene test_scene(num_cells_x,num_cells_y);
+	test_scene.add_boundary_inlet(5);
+	for (int i = 0; i < 60; i++)
+	{
+		test_scene.debug_print();
+		test_scene.simulate();
+	}
+	
 	return 0;
 }
