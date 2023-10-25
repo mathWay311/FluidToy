@@ -1,6 +1,7 @@
 #include <iostream>
-#include <windows.h>
 #include "fluid.h"
+#include "scene.h"
+#include <cstring>
 /*
 	Глобальные переменные
 */
@@ -49,10 +50,11 @@ void config_printout()
 
 int main(int argc, char const *argv[])
 {	
-	SetConsoleCP(65001);
-	SetConsoleOutputCP(65001);
 	process_arguments(argc, argv); // обработка аргументов
 	config_printout();
-	FluidDomain fluidDomain = FluidDomain(num_cells_x, num_cells_y);
+	FluidDomain fluidDomain = FluidDomain(num_cells_x, num_cells_y, fluidDomain.FULL);
+	fluidDomain.debug_print_field(fluidDomain.U_FIELD);
+	fluidDomain.simulate(1.0/120.0, -9.81, 5);
+	fluidDomain.debug_print_field(fluidDomain.U_FIELD);
 	return 0;
 }
